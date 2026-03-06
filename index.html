@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quanos AI Readiness Checker</title>
+  <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    :root {
+      --navy:    #04254a;
+      --blue:    #0070d4;
+      --soft:    #519ae7;
+      --red:     #e85742;
+      --bg:      #eef2f7;
+      --white:   #ffffff;
+      --text:    #1a2940;
+      --muted:   #5a6880;
+      --border:  #c8d6e8;
+      --fh:      'Comfortaa', sans-serif;
+      --fb:      'Roboto', sans-serif;
+      --radius:  12px;
+      --shadow:  0 4px 24px rgba(4,37,74,.12);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: var(--fb); font-weight: 300; color: var(--text); background: var(--bg); min-height: 100vh; }
+
+    /* Layout */
+    #app { max-width: 760px; margin: 0 auto; padding: 24px 16px 60px; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+    .card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); padding: 36px 40px; }
+    @media(max-width:600px) { .card { padding: 24px 20px; } }
+
+    /* Header */
+    .header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; }
+    .logo-mark { width: 40px; height: 40px; background: var(--navy); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+    .logo-mark svg { width: 22px; height: 22px; fill: none; stroke: var(--white); stroke-width: 2; }
+    .logo-text { font-family: var(--fh); font-size: 18px; color: var(--navy); }
+    .logo-badge { font-size: 11px; color: var(--muted); background: var(--bg); border: 1px solid var(--border); border-radius: 20px; padding: 2px 10px; margin-left: auto; }
+
+    /* Buttons */
+    .btn { display: inline-flex; align-items: center; gap: 8px; font-family: var(--fb); font-weight: 700; font-size: 15px; padding: 13px 26px; border-radius: 8px; border: none; cursor: pointer; text-decoration: none; transition: all .2s; }
+    .btn:disabled { opacity: .45; cursor: default; }
+    .btn-primary { background: var(--red); color: var(--white); }
+    .btn-primary:hover:not(:disabled) { background: #d04232; transform: translateY(-1px); box-shadow: 0 6px 20px rgba(232,87,66,.3); }
+    .btn-ghost { background: transparent; color: var(--blue); padding: 10px 16px; font-size: 14px; }
+    .btn-ghost:hover { background: var(--bg); }
+    .btn-white { background: var(--white); color: var(--navy); }
+    .btn-white:hover { background: #e8f0f8; transform: translateY(-1px); }
+    .btn-outline-white { background: transparent; color: var(--white); border: 1.5px solid rgba(255,255,255,.5); }
+    .btn-outline-white:hover { background: rgba(255,255,255,.12); }
+    .btn svg { width: 17px; height: 17px; flex-shrink: 0; }
+
+    /* Intro */
+    .intro-hero { background: linear-gradient(135deg, var(--navy) 0%, var(--blue) 100%); border-radius: var(--radius); padding: 44px 40px; color: var(--white); margin-bottom: 24px; }
+    .intro-hero h1 { font-family: var(--fh); font-size: clamp(22px,5vw,34px); line-height: 1.2; margin-bottom: 14px; }
+    .intro-hero p { font-size: 15px; font-weight: 300; opacity: .88; line-height: 1.65; max-width: 520px; }
+    .intro-chips { display: flex; gap: 12px; margin-top: 22px; flex-wrap: wrap; }
+    .chip { background: rgba(255,255,255,.15); border-radius: 20px; padding: 5px 14px; font-size: 13px; }
+
+    /* Progress */
+    .progress-wrap { margin-bottom: 24px; }
+    .progress-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+    .progress-label { font-size: 13px; color: var(--muted); }
+    .progress-count { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .progress-bar { background: var(--border); border-radius: 6px; height: 6px; overflow: hidden; }
+    .progress-fill { background: linear-gradient(90deg, var(--blue), var(--soft)); height: 100%; border-radius: 6px; transition: width .4s ease; }
+
+    /* Questions */
+    .q-section { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--soft); margin-bottom: 8px; }
+    .q-text { font-family: var(--fh); font-size: clamp(18px,4vw,22px); color: var(--navy); line-height: 1.35; margin-bottom: 6px; }
+    .q-hint { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
+    .opts { display: flex; flex-direction: column; gap: 10px; }
+    .opt { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border: 2px solid var(--border); border-radius: 10px; cursor: pointer; transition: all .18s; }
+    .opt:hover { border-color: var(--soft); background: #f4f8fd; }
+    .opt.selected { border-color: var(--blue); background: #e8f2fc; }
+    .opt.selected .opt-dot { background: var(--blue); border-color: var(--blue); }
+    .opt.selected .opt-dot::after { display: block; }
+    .opt-dot { width: 20px; height: 20px; min-width: 20px; border-radius: 50%; border: 2px solid var(--border); background: var(--white); position: relative; transition: all .18s; }
+    .opt-dot.sq { border-radius: 5px; }
+    .opt-dot::after { content:''; display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); width: 8px; height: 8px; background: var(--white); border-radius: 50%; }
+    .opt-dot.sq::after { border-radius: 2px; }
+    .opt-label { font-size: 15px; line-height: 1.4; }
+    .q-nav { display: flex; justify-content: space-between; align-items: center; margin-top: 28px; }
+
+    /* Score ring */
+    .score-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 28px; }
+    .score-ring { position: relative; width: 160px; height: 160px; }
+    .score-ring svg { transform: rotate(-90deg); }
+    .score-inner { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .score-num { font-family: var(--fh); font-size: 44px; color: var(--navy); line-height: 1; }
+    .score-of { font-size: 13px; color: var(--muted); margin-top: 2px; }
+    .score-title { font-family: var(--fh); font-size: 20px; color: var(--navy); text-align: center; margin-top: 14px; }
+    .score-desc { font-size: 14px; color: var(--muted); text-align: center; margin-top: 6px; max-width: 400px; line-height: 1.6; }
+
+    /* Maturity pill */
+    .maturity-pill { display: inline-block; padding: 5px 16px; border-radius: 20px; font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+    .pill-ein { background: #fff3f0; color: #c04030; }
+    .pill-auf { background: #fff8e8; color: #a07010; }
+    .pill-vor { background: #e8f4ee; color: #1a7a40; }
+
+    /* Bars */
+    .bars { margin: 22px 0; }
+    .bar-row { margin-bottom: 14px; }
+    .bar-meta { display: flex; justify-content: space-between; margin-bottom: 5px; }
+    .bar-name { font-size: 13px; color: var(--text); }
+    .bar-val { font-size: 13px; font-weight: 700; color: var(--navy); }
+    .bar-bg { background: var(--bg); border-radius: 6px; height: 8px; overflow: hidden; }
+    .bar-fg { height: 100%; border-radius: 6px; transition: width .8s ease; }
+    .bp { background: linear-gradient(90deg,#0070d4,#519ae7); }
+    .bk { background: linear-gradient(90deg,#5b3fd4,#9b7fe8); }
+    .bs { background: linear-gradient(90deg,#e85742,#f0876f); }
+
+    /* Pain list */
+    .pain-box { background: var(--bg); border-radius: 10px; padding: 18px 20px; margin: 20px 0; }
+    .pain-title { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 10px; }
+    .pain-item { display: flex; align-items: center; gap: 10px; font-size: 14px; color: var(--text); padding: 4px 0; }
+    .pain-dot { width: 18px; height: 18px; min-width: 18px; background: var(--red); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-weight: 700; }
+
+    /* Lead gate */
+    .gate-divider { display: flex; align-items: center; gap: 14px; margin: 28px 0; }
+    .gate-divider::before, .gate-divider::after { content:''; flex:1; height:1px; background: var(--border); }
+    .gate-divider span { font-size: 13px; color: var(--muted); white-space: nowrap; }
+    .gate-box { background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius); padding: 28px 30px; }
+    .gate-box h3 { font-family: var(--fh); font-size: 20px; color: var(--navy); margin-bottom: 8px; }
+    .gate-box p { font-size: 14px; color: var(--muted); line-height: 1.65; margin-bottom: 20px; }
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    @media(max-width:500px) { .form-row { grid-template-columns: 1fr; } }
+    .ff { display: flex; flex-direction: column; gap: 4px; }
+    .ff label { font-size: 11px; font-weight: 700; color: var(--navy); letter-spacing: .4px; text-transform: uppercase; }
+    .ff input { font-family: var(--fb); font-size: 14px; color: var(--text); background: var(--white); border: 1.5px solid var(--border); border-radius: 8px; padding: 10px 14px; outline: none; transition: border-color .18s; }
+    .ff input:focus { border-color: var(--blue); }
+    .ff input.err { border-color: var(--red); }
+    .consent-row { display: flex; align-items: flex-start; gap: 10px; margin: 14px 0 20px; }
+    .consent-row input[type=checkbox] { width: 15px; height: 15px; min-width: 15px; margin-top: 2px; accent-color: var(--blue); cursor: pointer; }
+    .consent-row label { font-size: 12px; color: var(--muted); line-height: 1.5; cursor: pointer; }
+    .consent-row a { color: var(--blue); }
+    .form-err { font-size: 12px; color: var(--red); margin-bottom: 10px; display: none; }
+
+    /* Product grid */
+    .section-title { font-family: var(--fh); font-size: 18px; color: var(--navy); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 2px solid var(--bg); }
+    .prod-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(290px,1fr)); gap: 14px; margin-bottom: 28px; }
+    .prod-card { background: var(--bg); border-radius: 10px; padding: 20px 22px; border-left: 4px solid var(--blue); }
+    .prod-card.ph { border-left-color: var(--red); }
+    .prod-tag { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--muted); margin-bottom: 5px; }
+    .prod-name { font-family: var(--fh); font-size: 17px; color: var(--navy); margin-bottom: 7px; }
+    .prod-why { font-size: 13px; color: var(--text); line-height: 1.55; margin-bottom: 12px; }
+    .prod-benefit { font-size: 13px; color: var(--blue); font-weight: 400; }
+    .prod-benefit::before { content: '✓  '; font-weight: 700; }
+
+    /* Next steps */
+    .next-steps { background: linear-gradient(135deg,var(--navy),#005bab); border-radius: var(--radius); padding: 28px 32px; color: var(--white); margin-top: 28px; }
+    .next-steps h3 { font-family: var(--fh); font-size: 20px; margin-bottom: 8px; }
+    .next-steps p { font-size: 14px; opacity: .85; margin-bottom: 20px; line-height: 1.6; }
+    .cta-row { display: flex; gap: 12px; flex-wrap: wrap; }
+
+    /* Overlay */
+    .overlay { position: fixed; inset: 0; background: rgba(4,37,74,.55); z-index: 100; display: none; align-items: center; justify-content: center; padding: 16px; }
+    .overlay.open { display: flex; }
+    .modal { background: var(--white); border-radius: var(--radius); box-shadow: 0 16px 60px rgba(0,0,0,.28); padding: 36px 40px; max-width: 500px; width: 100%; position: relative; }
+    @media(max-width:520px) { .modal { padding: 24px 20px; } }
+    .modal-close { position: absolute; top: 14px; right: 14px; background: var(--bg); border: none; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; font-size: 18px; color: var(--muted); display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { background: var(--border); }
+    .modal h3 { font-family: var(--fh); font-size: 21px; color: var(--navy); margin-bottom: 8px; }
+    .modal p { font-size: 14px; color: var(--muted); margin-bottom: 20px; line-height: 1.6; }
+    .success { text-align: center; padding: 16px 0; }
+    .success-icon { width: 60px; height: 60px; background: #e8f7ee; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
+
+    /* PDF hidden target */
+    #pdf-target { position: absolute; left: -9999px; top: 0; width: 750px; background: white; }
+
+    /* Fade in */
+    @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
+    .screen.active > * { animation: fadeUp .35s ease; }
+  </style>
+</head>
+<body>
+
+<div id="app">
+
+<!-- == SCREEN: Intro == -->
+<div id="s-intro" class="screen active">
+  <div class="header">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <span class="logo-text">Quanos</span>
+    <span class="logo-badge">AI Hub</span>
+  </div>
+  <div class="intro-hero">
+    <h1>Wie KI-bereit ist Ihr Unternehmen?</h1>
+    <p>Beantworten Sie 10 Fragen und erfahren Sie, welche Quanos KI-Loesungen den groessten Mehrwert fuer Ihre Prozesse bieten.</p>
+    <div class="intro-chips">
+      <span class="chip">Ca. 3 Minuten</span>
+      <span class="chip">Personalisierte Empfehlung</span>
+      <span class="chip">Kostenloser PDF-Report</span>
+    </div>
+  </div>
+  <div class="card">
+    <h2 style="font-family:var(--fh);font-size:20px;color:var(--navy);margin-bottom:12px;">Was Sie erwartet</h2>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">Der AI Readiness Checker analysiert Ihre aktuellen Prozesse, Ihren KI-Reifegrad und Ihre strategische Ausrichtung und zeigt Ihnen, mit welchen Quanos Loesungen Sie sofort starten koennen.</p>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;">
+      <div style="background:var(--bg);border-radius:8px;padding:16px 18px;">
+        <div style="font-family:var(--fh);font-size:30px;color:var(--blue);margin-bottom:4px;">40 %</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5;">der TechDok-Teams verlieren taeglich ueber 1 h durch manuelle Metadatenvergabe</div>
+      </div>
+      <div style="background:var(--bg);border-radius:8px;padding:16px 18px;">
+        <div style="font-family:var(--fh);font-size:30px;color:var(--red);margin-bottom:4px;">80 %</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5;">Zeitersparnis moeglich mit KI-gestuetzter Automatisierung von Kunden bestaetigt</div>
+      </div>
+    </div>
+    <button class="btn btn-primary" onclick="App.start()">
+      Jetzt starten
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+</div>
+
+<!-- == SCREEN: Questions == -->
+<div id="s-q" class="screen">
+  <div class="header">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <span class="logo-text">Quanos</span>
+    <span class="logo-badge">AI Readiness Checker</span>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-top">
+      <span class="progress-label" id="prog-section">Bereich &amp; Prozesse</span>
+      <span class="progress-count" id="prog-count">1 / 10</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:10%"></div></div>
+  </div>
+  <div class="card">
+    <div class="q-section" id="q-cat"></div>
+    <div class="q-text" id="q-text">Frage wird geladen...</div>
+    <div class="q-hint" id="q-hint"></div>
+    <div class="opts" id="opts-wrap"></div>
+    <div class="q-nav">
+      <button class="btn btn-ghost" id="btn-back" onclick="App.back()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+        Zurueck
+      </button>
+      <button class="btn btn-primary" id="btn-next" onclick="App.next()" disabled>
+        Weiter
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- == SCREEN: Basic Results + Lead Gate == -->
+<div id="s-basic" class="screen">
+  <div class="header">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <span class="logo-text">Quanos</span>
+    <span class="logo-badge">Ihr Ergebnis</span>
+  </div>
+  <div class="card">
+    <div style="text-align:center">
+      <div id="maturity-pill" class="maturity-pill pill-auf">KI-Aufholer</div>
+    </div>
+    <div class="score-wrap">
+      <div class="score-ring">
+        <svg width="160" height="160" viewBox="0 0 160 160">
+          <circle cx="80" cy="80" r="68" fill="none" stroke="#eef2f7" stroke-width="12"/>
+          <circle cx="80" cy="80" r="68" fill="none" stroke="url(#sg)" stroke-width="12"
+            stroke-linecap="round" id="score-arc"
+            stroke-dasharray="427.3" stroke-dashoffset="427.3" style="transition:stroke-dashoffset 1s ease"/>
+          <defs>
+            <linearGradient id="sg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" style="stop-color:#0070d4"/>
+              <stop offset="100%" style="stop-color:#519ae7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <div class="score-inner">
+          <div class="score-num" id="score-num">--</div>
+          <div class="score-of">von 100</div>
+        </div>
+      </div>
+      <div class="score-title" id="score-label"></div>
+      <div class="score-desc" id="score-desc"></div>
+    </div>
+
+    <div class="bars">
+      <div class="bar-row">
+        <div class="bar-meta"><span class="bar-name">Prozessreife</span><span class="bar-val" id="bv-p">--</span></div>
+        <div class="bar-bg"><div class="bar-fg bp" id="bf-p" style="width:0%"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-meta"><span class="bar-name">KI-Bereitschaft</span><span class="bar-val" id="bv-k">--</span></div>
+        <div class="bar-bg"><div class="bar-fg bk" id="bf-k" style="width:0%"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-meta"><span class="bar-name">Strategische Klarheit</span><span class="bar-val" id="bv-s">--</span></div>
+        <div class="bar-bg"><div class="bar-fg bs" id="bf-s" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="pain-box">
+      <div class="pain-title">Ihre wichtigsten Handlungsfelder</div>
+      <div id="pains-list"></div>
+    </div>
+
+    <!-- Lead Gate -->
+    <div class="gate-divider"><span>Kostenloser Detailreport</span></div>
+    <div class="gate-box">
+      <h3>Ihre persoenlichen Produktempfehlungen</h3>
+      <p>Erfahren Sie, welche Quanos KI-Loesungen genau zu Ihren Prozessen passen inklusive konkreter Einsparpotenziale und naechster Schritte als PDF.</p>
+      <div class="form-row">
+        <div class="ff"><label>Vorname *</label><input type="text" id="f-first" placeholder="Max"></div>
+        <div class="ff"><label>Nachname *</label><input type="text" id="f-last" placeholder="Mustermann"></div>
+      </div>
+      <div class="form-row">
+        <div class="ff"><label>E-Mail *</label><input type="email" id="f-email" placeholder="max@unternehmen.de"></div>
+        <div class="ff"><label>Unternehmen</label><input type="text" id="f-company" placeholder="Mustermann GmbH"></div>
+      </div>
+      <div class="form-err" id="form-err">Bitte fuellen Sie alle Pflichtfelder aus.</div>
+      <div class="consent-row">
+        <input type="checkbox" id="f-consent">
+        <label for="f-consent">Ich bin einverstanden, dass Quanos Solutions mich zu passenden KI-Loesungen kontaktiert. Verarbeitung gemaess <a href="https://quanos.com/datenschutz" target="_blank">Datenschutzerklaerung</a>.</label>
+      </div>
+      <button class="btn btn-primary" onclick="App.submitLead()">
+        Detailreport freischalten
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- == SCREEN: Full Results == -->
+<div id="s-full" class="screen">
+  <div class="header">
+    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+    <span class="logo-text">Quanos</span>
+    <span class="logo-badge">Ihr persoenlicher Report</span>
+  </div>
+  <div class="card">
+    <div id="result-greeting" style="font-family:var(--fh);font-size:22px;color:var(--navy);margin-bottom:8px;"></div>
+    <p id="result-summary" style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;"></p>
+
+    <div class="section-title">Empfohlene Quanos KI-Loesungen</div>
+    <div class="prod-grid" id="prod-grid"></div>
+
+    <div class="section-title" style="margin-top:8px;">Ihr Reifegrad im Detail</div>
+    <div class="bars" style="margin-bottom:0">
+      <div class="bar-row">
+        <div class="bar-meta"><span class="bar-name">Prozessreife (max. 40 Pkt.)</span><span class="bar-val" id="b2v-p">--</span></div>
+        <div class="bar-bg"><div class="bar-fg bp" id="b2f-p" style="width:0%"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-meta"><span class="bar-name">KI-Bereitschaft (max. 45 Pkt.)</span><span class="bar-val" id="b2v-k">--</span></div>
+        <div class="bar-bg"><div class="bar-fg bk" id="b2f-k" style="width:0%"></div></div>
+      </div>
+      <div class="bar-row">
+        <div class="bar-meta"><span class="bar-name">Strategische Klarheit (max. 15 Pkt.)</span><span class="bar-val" id="b2v-s">--</span></div>
+        <div class="bar-bg"><div class="bar-fg bs" id="b2f-s" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <div class="next-steps">
+      <h3>Ihre naechsten Schritte</h3>
+      <p>Unsere Experten zeigen Ihnen in einer kostenlosen Demo, wie Sie mit Quanos KI konkret Zeit und Kosten sparen abgestimmt auf Ihre Prozesse.</p>
+      <div class="cta-row">
+        <button class="btn btn-white" onclick="App.book()">Demo vereinbaren</button>
+        <button class="btn btn-outline-white" onclick="App.pdf()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          Report als PDF
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- #app -->
+
+<!-- == Booking Overlay == -->
+<div id="overlay-book" class="overlay">
+  <div class="modal">
+    <button class="modal-close" onclick="App.closeBook()">x</button>
+    <div id="book-form">
+      <h3>Demo-Termin vereinbaren</h3>
+      <p>Unsere Experten zeigen Ihnen live, wie die empfohlenen Quanos KI-Loesungen in Ihrer Umgebung funktionieren.</p>
+      <div class="form-row">
+        <div class="ff"><label>Vorname *</label><input type="text" id="b-first" placeholder="Max"></div>
+        <div class="ff"><label>Nachname *</label><input type="text" id="b-last" placeholder="Mustermann"></div>
+      </div>
+      <div class="ff" style="margin-bottom:12px;"><label>E-Mail *</label><input type="email" id="b-email" placeholder="max@unternehmen.de"></div>
+      <div class="ff" style="margin-bottom:20px;"><label>Telefon (optional)</label><input type="tel" id="b-phone" placeholder="+49 (0) ..."></div>
+      <div class="form-err" id="book-err">Bitte fuellen Sie alle Pflichtfelder aus.</div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="App.sendBook()">Anfrage absenden</button>
+    </div>
+    <div id="book-success" class="success" style="display:none;">
+      <div class="success-icon">&#10003;</div>
+      <h3 style="margin-bottom:8px;">Anfrage eingegangen!</h3>
+      <p style="color:var(--muted);margin-bottom:0;">Unser Team meldet sich innerhalb von 24 Stunden. Ihr AI-Readiness-Report wurde dabei automatisch uebermittelt.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Hidden PDF canvas -->
+<div id="pdf-target"></div>
+
+<script>
+'use strict';
+
+/* -- Questions -- */
+const QS = [
+  { id:'q1',  path:'all', cat:'prozess', section:'Ihr Taetigkeitsbereich',
+    text:'In welchem Bereich sind Sie taetig?',
+    hint:'Ihre Antwort passt die folgenden Fragen an Ihren Arbeitsbereich an.',
+    multi:false,
+    opts:[
+      {id:'doc', text:'Technische Redaktion / Dokumentation', score:0, tags:['persona_doc']},
+      {id:'svc', text:'After-Sales & Service / Kundendienst',  score:0, tags:['persona_svc']}
+    ]
+  },
+  { id:'q2',  path:'all', cat:'prozess', section:'Ihre Ausgangssituation',
+    text:'Wie gross ist Ihr Team?', hint:'', multi:false,
+    opts:[
+      {id:'sm', text:'1-5 Personen',        score:5,  tags:[]},
+      {id:'md', text:'6-20 Personen',       score:8,  tags:[]},
+      {id:'lg', text:'21-50 Personen',      score:10, tags:[]},
+      {id:'xl', text:'Mehr als 50 Personen',score:10, tags:[]}
+    ]
+  },
+  { id:'q3d', path:'doc', cat:'prozess', section:'Ihre Ausgangssituation',
+    text:'Welches System nutzen Sie fuer die Technische Dokumentation?', hint:'', multi:false,
+    opts:[
+      {id:'word',  text:'Word / PDF (kein CMS)',              score:2,  tags:['no_cms']},
+      {id:'st4',   text:'SCHEMA ST4',                        score:10, tags:['uses_st4']},
+      {id:'other', text:'Anderes CMS / Redaktionssystem',    score:7,  tags:['other_cms']},
+      {id:'none',  text:'Noch kein System etabliert',        score:0,  tags:['no_cms']}
+    ]
+  },
+  { id:'q3s', path:'svc', cat:'prozess', section:'Ihre Ausgangssituation',
+    text:'Wie stellen Sie Serviceinformationen bereit?', hint:'', multi:false,
+    opts:[
+      {id:'print',    text:'Gedruckte Handbuecher / PDFs',                    score:2,  tags:['no_digital']},
+      {id:'static',   text:'Statisches Online-Portal',                       score:5,  tags:['static_portal']},
+      {id:'infotwin', text:'Quanos InfoTwin oder aehnliches System',          score:10, tags:['uses_infotwin']},
+      {id:'none',     text:'Noch kein digitales System vorhanden',           score:0,  tags:['no_system']}
+    ]
+  },
+  { id:'q4d', path:'doc', cat:'prozess', section:'Prozesse & Aufwaende',
+    text:'Wie viel Aufwand bedeutet die Metadatenvergabe pro Woche?', hint:'', multi:false,
+    opts:[
+      {id:'low',   text:'Kaum Aufwand (unter 1 Stunde)', score:8, tags:[]},
+      {id:'med',   text:'1-4 Stunden',                   score:5, tags:['metadata_effort']},
+      {id:'high',  text:'5-10 Stunden',                  score:2, tags:['metadata_effort']},
+      {id:'vhigh', text:'Mehr als 10 Stunden',           score:0, tags:['metadata_effort']}
+    ]
+  },
+  { id:'q4s', path:'svc', cat:'prozess', section:'Prozesse & Aufwaende',
+    text:'Wie schnell finden Servicetechniker benoetigte Informationen?', hint:'', multi:false,
+    opts:[
+      {id:'instant',text:'Sofort (unter 1 Minute)',  score:10, tags:[]},
+      {id:'quick',  text:'1-5 Minuten',              score:7,  tags:[]},
+      {id:'slow',   text:'5-15 Minuten',             score:3,  tags:['slow_search']},
+      {id:'vslow',  text:'Mehr als 15 Minuten',      score:0,  tags:['slow_search']}
+    ]
+  },
+  { id:'q5d', path:'doc', cat:'prozess', section:'Prozesse & Aufwaende',
+    text:'Wie handhaben Sie Uebersetzungen Ihrer Dokumentation?', hint:'', multi:false,
+    opts:[
+      {id:'none',   text:'Kein Uebersetzungsbedarf',                score:8, tags:[]},
+      {id:'manual', text:'Manuelle Uebersetzung intern',            score:2, tags:['translation']},
+      {id:'agency', text:'Externe Uebersetzungsagentur',            score:4, tags:['translation_cost']},
+      {id:'semi',   text:'DeepL / Google Translate (manuell)',     score:4, tags:['translation_manual']}
+    ]
+  },
+  { id:'q5s', path:'svc', cat:'prozess', section:'Prozesse & Aufwaende',
+    text:'Wie aktuell sind Ihre Serviceinformationen typischerweise?', hint:'', multi:false,
+    opts:[
+      {id:'current',text:'Immer aktuell gepflegt',                     score:10, tags:[]},
+      {id:'mostly', text:'Meistens aktuell, gelegentlich veraltet',    score:6,  tags:[]},
+      {id:'often',  text:'Oft veraltet',                               score:2,  tags:['outdated_info']},
+      {id:'unknown',text:'Kein vollstaendiger Ueberblick',             score:0,  tags:['no_overview']}
+    ]
+  },
+  { id:'q6d', path:'doc', cat:'prozess', section:'Standards & Compliance',
+    text:'Welche Standards muessen Sie erfuellen?',
+    hint:'Mehrfachauswahl moeglich', multi:true,
+    opts:[
+      {id:'vdi',   text:'VDI 2770',                      score:3, tags:['vdi2770']},
+      {id:'iirds', text:'iiRDS',                         score:3, tags:['iirds']},
+      {id:'iec',   text:'IEC 61406 / QR-Code Standard',  score:3, tags:['iec']},
+      {id:'none',  text:'Keine speziellen Standards',   score:5,  tags:[]}
+    ]
+  },
+  { id:'q6s', path:'svc', cat:'prozess', section:'Standards & Compliance',
+    text:'Wie viele Produktvarianten verwalten Sie in Ihrer Servicedokumentation?', hint:'', multi:false,
+    opts:[
+      {id:'few',  text:'Weniger als 10 Varianten', score:8, tags:[]},
+      {id:'some', text:'10-50 Varianten',          score:5, tags:['variants']},
+      {id:'many', text:'50-200 Varianten',         score:3, tags:['many_variants']},
+      {id:'lots', text:'Mehr als 200 Varianten',   score:0, tags:['many_variants']}
+    ]
+  },
+  { id:'q7', path:'all', cat:'ki', section:'KI-Bereitschaft',
+    text:'Wie vertraut ist Ihr Team mit KI-Tools?', hint:'', multi:false,
+    opts:[
+      {id:'none', text:'Kaum / gar nicht vertraut',              score:3,  tags:[]},
+      {id:'exp',  text:'Wir experimentieren gelegentlich',       score:7,  tags:[]},
+      {id:'use',  text:'KI wird bereits produktiv genutzt',      score:11, tags:['ki_active']},
+      {id:'deep', text:'KI ist fester Bestandteil der Prozesse', score:15, tags:['ki_active']}
+    ]
+  },
+  { id:'q8', path:'all', cat:'ki', section:'KI-Bereitschaft',
+    text:'Wie hoch ist die Bereitschaft Ihres Unternehmens zur KI-Einfuehrung?', hint:'', multi:false,
+    opts:[
+      {id:'wait',     text:'Abwartend wir beobachten den Markt',  score:3,  tags:[]},
+      {id:'interest', text:'Interessiert Budget noch unklar',      score:7,  tags:[]},
+      {id:'roadmap',  text:'KI steht auf der Roadmap',             score:11, tags:[]},
+      {id:'active',   text:'Aktiv auf der Suche nach KI-Loesungen', score:15, tags:[]}
+    ]
+  },
+  { id:'q9', path:'all', cat:'strat', section:'Ziele & Strategie',
+    text:'Was sind Ihre wichtigsten Ziele fuer das naechste Jahr?',
+    hint:'Mehrfachauswahl moeglich', multi:true,
+    opts:[
+      {id:'auto',   text:'Manuelle Prozesse automatisieren',        score:3, tags:['goal_auto']},
+      {id:'qual',   text:'Qualitaet der Dokumentation verbessern',  score:3, tags:['goal_qual']},
+      {id:'cost',   text:'Kosten und Aufwand reduzieren',           score:3, tags:['goal_cost']},
+      {id:'speed',  text:'Schneller auf den Markt kommen',          score:3, tags:['goal_speed']},
+      {id:'comply', text:'Normen und Standards erfuellen',          score:3, tags:['goal_comply']}
+    ]
+  },
+  { id:'q10', path:'all', cat:'strat', section:'Ziele & Strategie',
+    text:'Wann planen Sie konkret den Einsatz von KI-Loesungen?', hint:'', multi:false,
+    opts:[
+      {id:'now',   text:'Sofort wir suchen aktiv',             score:6, tags:[]},
+      {id:'6mo',   text:'Innerhalb der naechsten 6 Monate',       score:5, tags:[]},
+      {id:'12mo',  text:'Innerhalb der naechsten 12 Monate',      score:3, tags:[]},
+      {id:'later', text:'Noch kein konkreter Zeitplan',          score:1, tags:[]}
+    ]
+  }
+];
+
+/* -- Products -- */
+const PRODS = {
+  st4: {
+    name:'SCHEMA ST4', tag:'XML-CMS fuer Technische Dokumentation',
+    why:'Ein strukturiertes CMS ist die Basis fuer alle KI-Automatisierungen. SCHEMA ST4 bringt Ihre Dokumentation auf das naechste Level und ermoeglicht effiziente, modulare Inhalte.',
+    benefit:'Strukturierte Inhalte als Fundament fuer KI-Automatisierung'
+  },
+  jetpack: {
+    name:'ST4 AI Jetpack', tag:'KI-Metadaten fuer SCHEMA ST4',
+    why:'Der ST4 AI Jetpack automatisiert die Metadatenvergabe in SCHEMA ST4 bis zu 80 % schneller als manuell. Die KI von plusmeta erkennt und vergibt passende Metadaten in Sekundenschnelle.',
+    benefit:'Bis zu 80 % weniger Aufwand bei der Metadatenvergabe'
+  },
+  translator: {
+    name:'ST4 AI Translator', tag:'KI-Uebersetzung via DeepL',
+    why:'Automatisierte Voruebersetzung direkt im ST4-Workflow. Die DeepL-Integration uebersetzt Ihre Inhalte in Sekunden und reduziert Uebersetzungskosten erheblich.',
+    benefit:'Deutlich niedrigere Kosten und Zeit bei Uebersetzungen'
+  },
+  plusmeta: {
+    name:'plusmeta Plattform', tag:'KI-Automatisierungsplattform',
+    why:'plusmeta automatisiert Metadatenvergabe und bereitet Dokumente fuer Standards wie VDI 2770 und iiRDS auf unabhaengig von Ihrem bestehenden System, als Plugin oder per API.',
+    benefit:'Standards-Compliance (VDI 2770 / iiRDS) automatisch'
+  },
+  infotwin: {
+    name:'Quanos InfoTwin', tag:'Digitales Service-Portal',
+    why:'InfoTwin digitalisiert Ihre Serviceinformationen und stellt sie produkt- und seriennummergenau bereit. Servicetechniker finden Informationen in Sekunden statt in Minuten.',
+    benefit:'Serviceinformationen immer aktuell, digital und gezielt abrufbar'
+  },
+  assistant: {
+    name:'InfoTwin AI Assistant', tag:'KI-Chatbot fuer Service',
+    why:'Der InfoTwin AI Assistant beantwortet Fragen zu technischen Dokumenten per Chat direkt aus Ihren verifizierten InfoTwin-Daten. RAG-Technologie verhindert Halluzinationen.',
+    benefit:'Sofortantworten auf alle Servicefragen per KI-Chat'
+  }
+};
+
+const PAIN_LABELS = {
+  no_cms:           'Kein CMS fehlende Dokumentationsstruktur',
+  metadata_effort:  'Hoher manueller Aufwand bei der Metadatenvergabe',
+  translation:      'Zeitaufwaendige manuelle Uebersetzungsprozesse',
+  translation_cost: 'Hohe Kosten durch externe Uebersetzungsagenturen',
+  translation_manual:'Keine automatisierte Uebersetzungsunterstuetzung',
+  vdi2770:          'VDI 2770-Compliance noch nicht umgesetzt',
+  iirds:            'iiRDS-Standard noch nicht implementiert',
+  iec:              'IEC 61406 / QR-Code-Standard ausstehend',
+  no_digital:       'Keine digitale Bereitstellung von Servicedaten',
+  static_portal:    'Statisches Portal ohne intelligente Filterung',
+  slow_search:      'Servicetechniker finden Informationen zu langsam',
+  outdated_info:    'Serviceinformationen oft nicht aktuell',
+  no_overview:      'Kein Ueberblick ueber Aktualitaet der Inhalte',
+  no_system:        'Kein digitales Servicesystem vorhanden',
+  variants:         'Verwaltung vieler Produktvarianten ist aufwaendig',
+  many_variants:    'Sehr hohe Komplexitaet durch viele Produktvarianten'
+};
+
+/* ==============================
+   APP
+============================== */
+const App = (() => {
+
+  const S = {
+    persona: 'doc',
+    active:  [],
+    idx:     0,
+    answers: {},
+    result:  null,
+    lead:    {}
+  };
+
+  /* helpers */
+  function show(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo({ top:0, behavior:'smooth' });
+  }
+
+  function buildActive() {
+    return QS.filter(q => q.path === 'all' || q.path === S.persona);
+  }
+
+  /* start */
+  function start() {
+    S.persona = 'doc'; S.answers = {}; S.idx = 0;
+    S.active = buildActive();
+    show('s-q'); render();
+  }
+
+  /* render */
+  function render() {
+    const q = S.active[S.idx];
+    const n = S.active.length;
+    const catLabel = { prozess:'Bereich & Prozesse', ki:'KI-Bereitschaft', strat:'Ziele & Strategie' };
+
+    document.getElementById('q-cat').textContent    = q.section || catLabel[q.cat] || '';
+    document.getElementById('q-text').textContent   = q.text;
+    document.getElementById('q-hint').textContent   = q.hint || '';
+    document.getElementById('prog-count').textContent = (S.idx + 1) + ' / ' + n;
+    document.getElementById('prog-section').textContent = catLabel[q.cat] || '';
+    document.getElementById('prog-fill').style.width = ((S.idx + 1) / n * 100) + '%';
+
+    const wrap = document.getElementById('opts-wrap');
+    wrap.innerHTML = '';
+    const saved = S.answers[q.id];
+
+    q.opts.forEach(function(opt) {
+      const div = document.createElement('div');
+      div.className = 'opt';
+      const dot = document.createElement('div');
+      dot.className = 'opt-dot' + (q.multi ? ' sq' : '');
+      const lbl = document.createElement('div');
+      lbl.className = 'opt-label';
+      lbl.textContent = opt.text;
+      div.append(dot, lbl);
+
+      const isSel = q.multi
+        ? (Array.isArray(saved) && saved.includes(opt.id))
+        : saved === opt.id;
+      if (isSel) div.classList.add('selected');
+
+      div.addEventListener('click', function() { pick(q, opt.id, div); });
+      wrap.appendChild(div);
+    });
+
+    const btnBack = document.getElementById('btn-back');
+    btnBack.disabled = S.idx === 0;
+    btnBack.style.opacity = S.idx === 0 ? '0.3' : '1';
+    refreshNext(q);
+  }
+
+  function refreshNext(q) {
+    const ans = S.answers[q.id];
+    const ok  = q.multi ? (Array.isArray(ans) && ans.length > 0) : !!ans;
+    const btn = document.getElementById('btn-next');
+    btn.disabled = !ok;
+    btn.style.opacity = ok ? '1' : '0.45';
+  }
+
+  function pick(q, optId, el) {
+    if (q.multi) {
+      if (!Array.isArray(S.answers[q.id])) S.answers[q.id] = [];
+      const arr = S.answers[q.id];
+      const i   = arr.indexOf(optId);
+      if (i > -1) { arr.splice(i, 1); el.classList.remove('selected'); }
+      else         { arr.push(optId);  el.classList.add('selected'); }
+    } else {
+      document.querySelectorAll('#opts-wrap .opt').forEach(function(o) { o.classList.remove('selected'); });
+      S.answers[q.id] = optId;
+      el.classList.add('selected');
+      if (q.id === 'q1') {
+        S.persona = optId;
+        S.active  = buildActive();
+      }
+    }
+    refreshNext(q);
+  }
+
+  function next() {
+    if (S.idx < S.active.length - 1) { S.idx++; render(); }
+    else { S.result = calcResults(); renderBasic(); show('s-basic'); }
+  }
+
+  function back() {
+    if (S.idx > 0) { S.idx--; render(); }
+  }
+
+  /* scoring */
+  function calcResults() {
+    const cats = {
+      prozess: { s:0, m:0, w:40 },
+      ki:      { s:0, m:0, w:45 },
+      strat:   { s:0, m:0, w:15 }
+    };
+    const tags = new Set();
+
+    S.active.forEach(function(q) {
+      const ans = S.answers[q.id];
+      if (!ans) return;
+      const sel = Array.isArray(ans) ? ans : [ans];
+      const mx  = Math.max.apply(null, q.opts.map(function(o) { return o.score; }));
+      cats[q.cat].m += mx;
+      sel.forEach(function(oid) {
+        const o = q.opts.find(function(x) { return x.id === oid; });
+        if (o) { cats[q.cat].s += o.score; o.tags.forEach(function(t) { tags.add(t); }); }
+      });
+    });
+
+    let total = 0;
+    const bd = {};
+    Object.entries(cats).forEach(function(entry) {
+      const k = entry[0]; const d = entry[1];
+      const norm = d.m > 0 ? Math.min(d.w, Math.round(d.s / d.m * d.w)) : 0;
+      bd[k] = { score: norm, max: d.w };
+      total += norm;
+    });
+
+    const pains = Array.from(tags).filter(function(t) {
+      return !t.startsWith('persona_') && !t.startsWith('goal_') &&
+             !t.startsWith('ki_') && !t.startsWith('uses_') && !t.startsWith('other_');
+    });
+
+    return { total: total, bd: bd, tags: Array.from(tags), pains: pains, recs: getRecs(tags, bd.ki.score) };
+  }
+
+  function getRecs(tags, kiScore) {
+    const t  = function(id) { return tags.has(id); };
+    const p  = S.persona;
+    const rs = [];
+
+    if (p === 'doc') {
+      if (t('no_cms'))                                 rs.push({ id:'st4',        pr:3 });
+      if (t('metadata_effort') || t('uses_st4'))       rs.push({ id:'jetpack',    pr: t('metadata_effort') ? 3 : 2 });
+      if (t('translation') || t('translation_cost') || t('translation_manual'))
+                                                       rs.push({ id:'translator', pr:2 });
+      if (t('vdi2770') || t('iirds') || t('iec') || t('metadata_effort'))
+                                                       rs.push({ id:'plusmeta',   pr: (t('vdi2770')||t('iirds')) ? 3 : 2 });
+    }
+
+    if (p === 'svc') {
+      if (t('no_digital') || t('static_portal') || t('no_system') || t('slow_search') || t('outdated_info') || t('many_variants'))
+                                                       rs.push({ id:'infotwin',   pr:3 });
+      if (t('slow_search') || t('uses_infotwin'))      rs.push({ id:'assistant',  pr: t('uses_infotwin') ? 3 : 2 });
+      if (t('variants') || t('many_variants'))         rs.push({ id:'plusmeta',   pr:2 });
+    }
+
+    if (rs.length === 0) {
+      rs.push({ id: p === 'svc' ? 'infotwin' : 'jetpack', pr:1 });
+    }
+
+    const seen = new Set();
+    return rs
+      .filter(function(r) { if (seen.has(r.id)) return false; seen.add(r.id); return true; })
+      .sort(function(a,b) { return b.pr - a.pr; })
+      .map(function(r) { return r.id; });
+  }
+
+  /* basic results */
+  function renderBasic() {
+    const r = S.result;
+    const score = r.total;
+
+    const circumference = 2 * Math.PI * 68;
+    const offset = circumference - (score / 100) * circumference;
+    setTimeout(function() { document.getElementById('score-arc').style.strokeDashoffset = offset; }, 80);
+    document.getElementById('score-num').textContent = score;
+
+    let level, desc, pc;
+    if (score <= 35) {
+      level='KI-Einsteiger'; pc='pill-ein';
+      desc='Sie stehen am Anfang Ihrer KI-Reise. Es gibt klare Quick-Wins, die Sie sofort umsetzen koennen.';
+    } else if (score <= 65) {
+      level='KI-Aufholer'; pc='pill-auf';
+      desc='Ihre Basis ist solide. Mit gezielten KI-Loesungen erzielen Sie jetzt deutliche Effizienzgewinne.';
+    } else {
+      level='KI-Vorreiter'; pc='pill-vor';
+      desc='Sie sind gut aufgestellt. Jetzt geht es darum, KI tief in Ihre Prozesse zu integrieren.';
+    }
+    document.getElementById('score-label').textContent = level;
+    document.getElementById('score-desc').textContent  = desc;
+    const pill = document.getElementById('maturity-pill');
+    pill.textContent = level; pill.className = 'maturity-pill ' + pc;
+
+    const bmap = { prozess:'p', ki:'k', strat:'s' };
+    Object.entries(bmap).forEach(function(entry) {
+      const cat = entry[0]; const key = entry[1];
+      const d = r.bd[cat];
+      const pct = Math.round(d.score / d.max * 100);
+      document.getElementById('bv-' + key).textContent = d.score + ' / ' + d.max;
+      setTimeout(function() { document.getElementById('bf-' + key).style.width = pct + '%'; }, 200);
+    });
+
+    const pl = document.getElementById('pains-list');
+    pl.innerHTML = '';
+    const top = r.pains.slice(0,4);
+    if (!top.length) {
+      pl.innerHTML = '<div class="pain-item" style="color:var(--muted)">Keine kritischen Handlungsfelder starke Ausgangsbasis!</div>';
+    } else {
+      top.forEach(function(p) {
+        pl.innerHTML += '<div class="pain-item"><div class="pain-dot">!</div>' + (PAIN_LABELS[p] || p) + '</div>';
+      });
+    }
+  }
+
+  /* lead submit */
+  function submitLead() {
+    const first   = document.getElementById('f-first').value.trim();
+    const last    = document.getElementById('f-last').value.trim();
+    const email   = document.getElementById('f-email').value.trim();
+    const company = document.getElementById('f-company').value.trim();
+    const consent = document.getElementById('f-consent').checked;
+    const errEl   = document.getElementById('form-err');
+
+    ['f-first','f-last','f-email'].forEach(function(id) { document.getElementById(id).classList.remove('err'); });
+
+    let ok = true;
+    if (!first)                       { document.getElementById('f-first').classList.add('err'); ok=false; }
+    if (!last)                        { document.getElementById('f-last').classList.add('err');  ok=false; }
+    if (!email||!email.includes('@')) { document.getElementById('f-email').classList.add('err'); ok=false; }
+
+    if (!ok || !consent) {
+      errEl.textContent = !consent && ok
+        ? 'Bitte stimmen Sie der Datenschutzerklaerung zu.'
+        : 'Bitte fuellen Sie alle Pflichtfelder aus.';
+      errEl.style.display = 'block';
+      return;
+    }
+    errEl.style.display = 'none';
+    S.lead = { first: first, last: last, email: email, company: company };
+
+    /* HubSpot Forms API submission */
+    fetch('https://api.hsforms.com/submissions/v3/integration/submit/27030828/25118f23-6fb6-49e9-bfd4-bac039141724', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        fields: [
+          { objectTypeId: '0-1', name: 'firstname', value: first },
+          { objectTypeId: '0-1', name: 'lastname',  value: last  },
+          { objectTypeId: '0-1', name: 'email',     value: email },
+          { objectTypeId: '0-1', name: 'company',   value: company }
+        ],
+        context: {
+          pageUri:  window.location.href,
+          pageName: document.title
+        },
+        legalConsentOptions: {
+          consent: {
+            consentToProcess: true,
+            text: 'Ich stimme der Verarbeitung meiner Daten gemaess der Datenschutzerklaerung zu.'
+          }
+        }
+      })
+    }).catch(function() { /* Fehler beim HubSpot-Submit – UX nicht blockieren */ });
+
+    renderFull(); show('s-full');
+  }
+
+  /* full results */
+  function renderFull() {
+    const r = S.result;
+    const l = S.lead;
+
+    document.getElementById('result-greeting').textContent =
+      (l.first ? l.first + ', Ihr' : 'Ihr') + ' persoenlicher AI-Readiness-Report';
+
+    const sumTexts = [
+      'Mit ' + r.total + ' von 100 Punkten stehen Sie am Beginn Ihrer KI-Transformation. Unsere Empfehlungen helfen Ihnen, schnell messbare Ergebnisse zu erzielen.',
+      'Mit ' + r.total + ' von 100 Punkten haben Sie eine solide Basis. Gezielte KI-Loesungen bringen Sie jetzt deutlich voran.',
+      'Mit ' + r.total + ' von 100 Punkten sind Sie KI-Vorreiter. Nutzen Sie jetzt das volle Potenzial der Quanos KI-Plattform.'
+    ];
+    document.getElementById('result-summary').textContent =
+      r.total <= 35 ? sumTexts[0] : r.total <= 65 ? sumTexts[1] : sumTexts[2];
+
+    const grid = document.getElementById('prod-grid');
+    grid.innerHTML = '';
+    r.recs.forEach(function(id, i) {
+      const p = PRODS[id];
+      if (!p) return;
+      grid.innerHTML += '<div class="prod-card ' + (i===0?'ph':'') + '">' +
+        '<div class="prod-tag">' + p.tag + '</div>' +
+        '<div class="prod-name">' + p.name + '</div>' +
+        '<div class="prod-why">' + p.why + '</div>' +
+        '<div class="prod-benefit">' + p.benefit + '</div>' +
+        '</div>';
+    });
+    if (!r.recs.length) {
+      grid.innerHTML = '<p style="color:var(--muted);font-size:14px;">Wir empfehlen ein individuelles Beratungsgespraech mit unseren Experten.</p>';
+    }
+
+    const bmap = { prozess:'p', ki:'k', strat:'s' };
+    Object.entries(bmap).forEach(function(entry) {
+      const cat = entry[0]; const key = entry[1];
+      const d = r.bd[cat];
+      const pct = Math.round(d.score / d.max * 100);
+      document.getElementById('b2v-' + key).textContent = d.score + ' / ' + d.max + ' Pkt.';
+      setTimeout(function() { document.getElementById('b2f-' + key).style.width = pct + '%'; }, 200);
+    });
+  }
+
+  /* booking */
+  function book() {
+    const l = S.lead;
+    document.getElementById('b-first').value = l.first || '';
+    document.getElementById('b-last').value  = l.last  || '';
+    document.getElementById('b-email').value = l.email || '';
+    document.getElementById('book-form').style.display    = 'block';
+    document.getElementById('book-success').style.display = 'none';
+    document.getElementById('overlay-book').classList.add('open');
+  }
+
+  function closeBook() {
+    document.getElementById('overlay-book').classList.remove('open');
+  }
+
+  function sendBook() {
+    const first = document.getElementById('b-first').value.trim();
+    const last  = document.getElementById('b-last').value.trim();
+    const email = document.getElementById('b-email').value.trim();
+    const errEl = document.getElementById('book-err');
+    if (!first || !last || !email || !email.includes('@')) {
+      errEl.style.display = 'block'; return;
+    }
+    errEl.style.display = 'none';
+    document.getElementById('book-form').style.display    = 'none';
+    document.getElementById('book-success').style.display = 'block';
+  }
+
+  /* PDF */
+  function pdf() {
+    const r = S.result;
+    const l = S.lead;
+    const maturity = r.total <= 35 ? 'KI-Einsteiger' : r.total <= 65 ? 'KI-Aufholer' : 'KI-Vorreiter';
+
+    const recHtml = r.recs.map(function(id) {
+      const p = PRODS[id];
+      return p ? '<div style="background:#eef2f7;border-radius:8px;padding:16px;margin-bottom:12px;border-left:4px solid #0070d4;">' +
+        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5a6880;margin-bottom:3px;">' + p.tag + '</div>' +
+        '<div style="font-size:16px;font-weight:700;color:#04254a;margin-bottom:5px;">' + p.name + '</div>' +
+        '<div style="font-size:13px;color:#1a2940;line-height:1.5;">' + p.why + '</div>' +
+        '</div>' : '';
+    }).join('');
+
+    const painHtml = r.pains.slice(0,5).map(function(p) {
+      return '<li style="margin-bottom:5px;font-size:13px;">' + (PAIN_LABELS[p]||p) + '</li>';
+    }).join('');
+
+    const target = document.getElementById('pdf-target');
+    target.innerHTML =
+      '<div style="font-family:sans-serif;color:#1a2940;padding:40px;max-width:700px;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #eef2f7;">' +
+          '<div>' +
+            '<div style="font-size:22px;font-weight:700;color:#04254a;margin-bottom:3px;">Quanos AI Readiness Report</div>' +
+            '<div style="font-size:13px;color:#5a6880;">' + l.first + ' ' + l.last + (l.company?' - '+l.company:'') + ' - ' + new Date().toLocaleDateString('de-DE') + '</div>' +
+          '</div>' +
+          '<div style="background:#04254a;color:white;border-radius:10px;padding:12px 22px;text-align:center;">' +
+            '<div style="font-size:36px;font-weight:700;">' + r.total + '</div>' +
+            '<div style="font-size:11px;opacity:.8;">von 100</div>' +
+          '</div>' +
+        '</div>' +
+        '<div style="background:linear-gradient(135deg,#04254a,#0070d4);border-radius:10px;padding:22px 26px;color:white;margin-bottom:24px;">' +
+          '<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-bottom:3px;">Ihr Reifegrad</div>' +
+          '<div style="font-size:22px;font-weight:700;margin-bottom:6px;">' + maturity + '</div>' +
+          '<div style="font-size:13px;opacity:.88;">Prozessreife: ' + r.bd.prozess.score + '/' + r.bd.prozess.max + ' Pkt. | KI-Bereitschaft: ' + r.bd.ki.score + '/' + r.bd.ki.max + ' Pkt. | Strategie: ' + r.bd.strat.score + '/' + r.bd.strat.max + ' Pkt.</div>' +
+        '</div>' +
+        '<div style="font-size:17px;font-weight:700;color:#04254a;margin-bottom:12px;border-bottom:2px solid #eef2f7;padding-bottom:8px;">Ihre Produktempfehlungen</div>' +
+        recHtml +
+        (painHtml ? '<div style="font-size:17px;font-weight:700;color:#04254a;margin:20px 0 10px;border-bottom:2px solid #eef2f7;padding-bottom:8px;">Identifizierte Handlungsfelder</div><ul style="padding-left:20px;line-height:1.8;">' + painHtml + '</ul>' : '') +
+        '<div style="margin-top:32px;padding-top:16px;border-top:1px solid #eef2f7;text-align:center;color:#5a6880;font-size:11px;">' +
+          'Quanos Solutions GmbH - quanos.com - Dieser Report wurde automatisch generiert.' +
+        '</div>' +
+      '</div>';
+
+    html2pdf().set({
+      margin: 0,
+      filename: 'Quanos-AI-Readiness-Report-' + (l.last||'Report') + '.pdf',
+      image: { type:'jpeg', quality:0.95 },
+      html2canvas: { scale:2, useCORS:true },
+      jsPDF: { unit:'px', format:'a4', orientation:'portrait', hotfixes:['px_scaling'] }
+    }).from(target).save().then(function() { target.innerHTML = ''; });
+  }
+
+  /* backdrop close */
+  document.getElementById('overlay-book').addEventListener('click', function(e) {
+    if (e.target === this) closeBook();
+  });
+
+  return { start: start, next: next, back: back, submitLead: submitLead, book: book, closeBook: closeBook, sendBook: sendBook, pdf: pdf };
+
+})();
+</script>
+</body>
+</html>
