@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quanos AI Readiness Checker</title>
   <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@700&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
       --navy:    #003865;
@@ -167,9 +166,6 @@
     .success { text-align: center; padding: 16px 0; }
     .success-icon { width: 60px; height: 60px; background: #e8f7ee; border-radius: 50%; margin: 0 auto 16px; display: flex; align-items: center; justify-content: center; font-size: 26px; }
 
-    /* PDF hidden target */
-    #pdf-target { position: absolute; left: -9999px; top: 0; width: 750px; background: white; }
-
     /* Fade in */
     @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
     .screen.active > * { animation: fadeUp .35s ease; }
@@ -187,7 +183,6 @@
     <div class="intro-chips">
       <span class="chip">Ca. 3 Minuten</span>
       <span class="chip">Personalisierte Empfehlung</span>
-      <span class="chip">Kostenloser PDF-Report</span>
     </div>
   </div>
   <div class="card">
@@ -290,7 +285,7 @@
     <div class="gate-divider"><span>Kostenloser Detailreport</span></div>
     <div class="gate-box">
       <h3>Ihre persönlichen Produktempfehlungen</h3>
-      <p>Erfahren Sie, welche Quanos KI-Lösungen genau zu Ihren Prozessen passen inklusive konkreter Einsparpotenziale und nächster Schritte als PDF.</p>
+      <p>Erfahren Sie, welche Quanos KI-Lösungen genau zu Ihren Prozessen passen inklusive konkreter Einsparpotenziale und nächster Schritte.</p>
       <div class="form-row">
         <div class="ff"><label>Vorname *</label><input type="text" id="f-first" placeholder="Max"></div>
         <div class="ff"><label>Nachname *</label><input type="text" id="f-last" placeholder="Mustermann"></div>
@@ -342,10 +337,6 @@
       <p>Unsere Experten zeigen Ihnen in einer kostenlosen Demo, wie Sie mit Quanos KI konkret Zeit und Kosten sparen abgestimmt auf Ihre Prozesse.</p>
       <div class="cta-row">
         <button class="btn btn-white" onclick="App.book()">Demo vereinbaren</button>
-        <button class="btn btn-outline-white" onclick="App.pdf()">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-          Report als PDF
-        </button>
       </div>
     </div>
   </div>
@@ -377,8 +368,6 @@
   </div>
 </div>
 
-<!-- Hidden PDF canvas -->
-<div id="pdf-target"></div>
 
 <script>
 'use strict';
@@ -822,6 +811,32 @@ const App = (() => {
     errEl.style.display = 'none';
     S.lead = { first: first, last: last, email: email, company: company };
 
+    /* Build answer summary for message field */
+    function buildAnswerSummary() {
+      const r = S.result;
+      var lines = [];
+      lines.push('=== Quanos AI Readiness Checker – Ergebnisse ===');
+      lines.push('Gesamtscore: ' + r.total + ' / 100 Punkte');
+      lines.push('Reifegrad: ' + (r.total <= 35 ? 'KI-Einsteiger' : r.total <= 65 ? 'KI-Aufholer' : 'KI-Vorreiter'));
+      lines.push('Prozessreife: ' + r.bd.prozess.score + ' / ' + r.bd.prozess.max + ' Pkt.');
+      lines.push('KI-Bereitschaft: ' + r.bd.ki.score + ' / ' + r.bd.ki.max + ' Pkt.');
+      lines.push('Strategische Klarheit: ' + r.bd.strat.score + ' / ' + r.bd.strat.max + ' Pkt.');
+      lines.push('');
+      lines.push('=== Antworten ===');
+      S.active.forEach(function(q, i) {
+        var ans = S.answers[q.id];
+        if (!ans) return;
+        var sel = Array.isArray(ans) ? ans : [ans];
+        var labels = sel.map(function(oid) {
+          var opt = q.opts.find(function(o) { return o.id === oid; });
+          return opt ? opt.text : oid;
+        });
+        lines.push((i + 1) + '. ' + q.text);
+        lines.push('   → ' + labels.join(', '));
+      });
+      return lines.join('\n');
+    }
+
     /* HubSpot Forms API submission */
     fetch('https://api.hsforms.com/submissions/v3/integration/submit/27030828/25118f23-6fb6-49e9-bfd4-bac039141724', {
       method: 'POST',
@@ -831,7 +846,8 @@ const App = (() => {
           { objectTypeId: '0-1', name: 'firstname', value: first },
           { objectTypeId: '0-1', name: 'lastname',  value: last  },
           { objectTypeId: '0-1', name: 'email',     value: email },
-          { objectTypeId: '0-1', name: 'company',   value: company }
+          { objectTypeId: '0-1', name: 'company',   value: company },
+          { objectTypeId: '0-1', name: 'message',   value: buildAnswerSummary() }
         ],
         context: {
           pageUri:  window.location.href,
@@ -919,66 +935,13 @@ const App = (() => {
     document.getElementById('book-success').style.display = 'block';
   }
 
-  /* PDF */
-  function pdf() {
-    const r = S.result;
-    const l = S.lead;
-    const maturity = r.total <= 35 ? 'KI-Einsteiger' : r.total <= 65 ? 'KI-Aufholer' : 'KI-Vorreiter';
-
-    const recHtml = r.recs.map(function(id) {
-      const p = PRODS[id];
-      return p ? '<div style="background:#f3f5f8;border-radius:8px;padding:16px;margin-bottom:12px;border-left:4px solid #0070d4;">' +
-        '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5a6880;margin-bottom:3px;">' + p.tag + '</div>' +
-        '<div style="font-size:16px;font-weight:700;color:#04254a;margin-bottom:5px;">' + p.name + '</div>' +
-        '<div style="font-size:13px;color:#1a2940;line-height:1.5;">' + p.why + '</div>' +
-        '</div>' : '';
-    }).join('');
-
-    const painHtml = r.pains.slice(0,5).map(function(p) {
-      return '<li style="margin-bottom:5px;font-size:13px;">' + (PAIN_LABELS[p]||p) + '</li>';
-    }).join('');
-
-    const target = document.getElementById('pdf-target');
-    target.innerHTML =
-      '<div style="font-family:sans-serif;color:#1a2940;padding:40px;max-width:700px;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #f3f5f8;">' +
-          '<div>' +
-            '<div style="font-size:22px;font-weight:700;color:#04254a;margin-bottom:3px;">Quanos AI Readiness Report</div>' +
-            '<div style="font-size:13px;color:#5a6880;">' + l.first + ' ' + l.last + (l.company?' - '+l.company:'') + ' - ' + new Date().toLocaleDateString('de-DE') + '</div>' +
-          '</div>' +
-          '<div style="background:#04254a;color:white;border-radius:10px;padding:12px 22px;text-align:center;">' +
-            '<div style="font-size:36px;font-weight:700;">' + r.total + '</div>' +
-            '<div style="font-size:11px;opacity:.8;">von 100</div>' +
-          '</div>' +
-        '</div>' +
-        '<div style="background:linear-gradient(135deg,#04254a,#0070d4);border-radius:10px;padding:22px 26px;color:white;margin-bottom:24px;">' +
-          '<div style="font-size:11px;text-transform:uppercase;letter-spacing:1px;opacity:.8;margin-bottom:3px;">Ihr Reifegrad</div>' +
-          '<div style="font-size:22px;font-weight:700;margin-bottom:6px;">' + maturity + '</div>' +
-          '<div style="font-size:13px;opacity:.88;">Prozessreife: ' + r.bd.prozess.score + '/' + r.bd.prozess.max + ' Pkt. | KI-Bereitschaft: ' + r.bd.ki.score + '/' + r.bd.ki.max + ' Pkt. | Strategie: ' + r.bd.strat.score + '/' + r.bd.strat.max + ' Pkt.</div>' +
-        '</div>' +
-        '<div style="font-size:17px;font-weight:700;color:#04254a;margin-bottom:12px;border-bottom:2px solid #f3f5f8;padding-bottom:8px;">Ihre Produktempfehlungen</div>' +
-        recHtml +
-        (painHtml ? '<div style="font-size:17px;font-weight:700;color:#04254a;margin:20px 0 10px;border-bottom:2px solid #f3f5f8;padding-bottom:8px;">Identifizierte Handlungsfelder</div><ul style="padding-left:20px;line-height:1.8;">' + painHtml + '</ul>' : '') +
-        '<div style="margin-top:32px;padding-top:16px;border-top:1px solid #f3f5f8;text-align:center;color:#5a6880;font-size:11px;">' +
-          'Quanos Solutions GmbH - quanos.com - Dieser Report wurde automatisch generiert.' +
-        '</div>' +
-      '</div>';
-
-    html2pdf().set({
-      margin: 0,
-      filename: 'Quanos-AI-Readiness-Report-' + (l.last||'Report') + '.pdf',
-      image: { type:'jpeg', quality:0.95 },
-      html2canvas: { scale:2, useCORS:true },
-      jsPDF: { unit:'px', format:'a4', orientation:'portrait', hotfixes:['px_scaling'] }
-    }).from(target).save().then(function() { target.innerHTML = ''; });
-  }
 
   /* backdrop close */
   document.getElementById('overlay-book').addEventListener('click', function(e) {
     if (e.target === this) closeBook();
   });
 
-  return { start: start, next: next, back: back, submitLead: submitLead, book: book, closeBook: closeBook, sendBook: sendBook, pdf: pdf };
+  return { start: start, next: next, back: back, submitLead: submitLead, book: book, closeBook: closeBook, sendBook: sendBook };
 
 })();
 </script>
