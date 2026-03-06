@@ -8,15 +8,15 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
-      --navy:    #04254a;
-      --blue:    #0070d4;
-      --soft:    #519ae7;
+      --navy:    #003865;
+      --blue:    #0057A0;
+      --soft:    #00A3E0;
       --red:     #e85742;
-      --bg:      #eef2f7;
+      --bg:      #f3f5f8;
       --white:   #ffffff;
-      --text:    #1a2940;
-      --muted:   #5a6880;
-      --border:  #c8d6e8;
+      --text:    #1A1A2E;
+      --muted:   #666666;
+      --border:  #E0E6EF;
       --fh:      'Comfortaa', sans-serif;
       --fb:      'Roboto', sans-serif;
       --radius:  12px;
@@ -181,14 +181,9 @@
 
 <!-- == SCREEN: Intro == -->
 <div id="s-intro" class="screen active">
-  <div class="header">
-    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-    <span class="logo-text">Quanos</span>
-    <span class="logo-badge">AI Hub</span>
-  </div>
   <div class="intro-hero">
     <h1>Wie KI-bereit ist Ihr Unternehmen?</h1>
-    <p>Beantworten Sie 10 Fragen und erfahren Sie, welche Quanos KI-Loesungen den groessten Mehrwert fuer Ihre Prozesse bieten.</p>
+    <p>Beantworten Sie 10 Fragen und erfahren Sie, welche Quanos KI-Lösungen den groessten Mehrwert für Ihre Prozesse bieten.</p>
     <div class="intro-chips">
       <span class="chip">Ca. 3 Minuten</span>
       <span class="chip">Personalisierte Empfehlung</span>
@@ -197,15 +192,15 @@
   </div>
   <div class="card">
     <h2 style="font-family:var(--fh);font-size:20px;color:var(--navy);margin-bottom:12px;">Was Sie erwartet</h2>
-    <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">Der AI Readiness Checker analysiert Ihre aktuellen Prozesse, Ihren KI-Reifegrad und Ihre strategische Ausrichtung und zeigt Ihnen, mit welchen Quanos Loesungen Sie sofort starten koennen.</p>
+    <p style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:24px;">Der AI Readiness Checker analysiert Ihre aktuellen Prozesse, Ihren KI-Reifegrad und Ihre strategische Ausrichtung und zeigt Ihnen, mit welchen Quanos Lösungen Sie sofort starten können.</p>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:28px;">
       <div style="background:var(--bg);border-radius:8px;padding:16px 18px;">
         <div style="font-family:var(--fh);font-size:30px;color:var(--blue);margin-bottom:4px;">40 %</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5;">der TechDok-Teams verlieren taeglich ueber 1 h durch manuelle Metadatenvergabe</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5;">der TechDok-Teams verlieren täglich ueber 1 h durch manuelle Metadatenvergabe</div>
       </div>
       <div style="background:var(--bg);border-radius:8px;padding:16px 18px;">
         <div style="font-family:var(--fh);font-size:30px;color:var(--red);margin-bottom:4px;">80 %</div>
-        <div style="font-size:13px;color:var(--muted);line-height:1.5;">Zeitersparnis moeglich mit KI-gestuetzter Automatisierung von Kunden bestaetigt</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.5;">Zeitersparnis möglich mit KI-gestützter Automatisierung von Kunden bestätigt</div>
       </div>
     </div>
     <button class="btn btn-primary" onclick="App.start()">
@@ -217,11 +212,6 @@
 
 <!-- == SCREEN: Questions == -->
 <div id="s-q" class="screen">
-  <div class="header">
-    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-    <span class="logo-text">Quanos</span>
-    <span class="logo-badge">AI Readiness Checker</span>
-  </div>
   <div class="progress-wrap">
     <div class="progress-top">
       <span class="progress-label" id="prog-section">Bereich &amp; Prozesse</span>
@@ -237,7 +227,7 @@
     <div class="q-nav">
       <button class="btn btn-ghost" id="btn-back" onclick="App.back()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
-        Zurueck
+        Zurück
       </button>
       <button class="btn btn-primary" id="btn-next" onclick="App.next()" disabled>
         Weiter
@@ -249,11 +239,6 @@
 
 <!-- == SCREEN: Basic Results + Lead Gate == -->
 <div id="s-basic" class="screen">
-  <div class="header">
-    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-    <span class="logo-text">Quanos</span>
-    <span class="logo-badge">Ihr Ergebnis</span>
-  </div>
   <div class="card">
     <div style="text-align:center">
       <div id="maturity-pill" class="maturity-pill pill-auf">KI-Aufholer</div>
@@ -261,7 +246,7 @@
     <div class="score-wrap">
       <div class="score-ring">
         <svg width="160" height="160" viewBox="0 0 160 160">
-          <circle cx="80" cy="80" r="68" fill="none" stroke="#eef2f7" stroke-width="12"/>
+          <circle cx="80" cy="80" r="68" fill="none" stroke="#f3f5f8" stroke-width="12"/>
           <circle cx="80" cy="80" r="68" fill="none" stroke="url(#sg)" stroke-width="12"
             stroke-linecap="round" id="score-arc"
             stroke-dasharray="427.3" stroke-dashoffset="427.3" style="transition:stroke-dashoffset 1s ease"/>
@@ -304,8 +289,8 @@
     <!-- Lead Gate -->
     <div class="gate-divider"><span>Kostenloser Detailreport</span></div>
     <div class="gate-box">
-      <h3>Ihre persoenlichen Produktempfehlungen</h3>
-      <p>Erfahren Sie, welche Quanos KI-Loesungen genau zu Ihren Prozessen passen inklusive konkreter Einsparpotenziale und naechster Schritte als PDF.</p>
+      <h3>Ihre persönlichen Produktempfehlungen</h3>
+      <p>Erfahren Sie, welche Quanos KI-Lösungen genau zu Ihren Prozessen passen inklusive konkreter Einsparpotenziale und nächster Schritte als PDF.</p>
       <div class="form-row">
         <div class="ff"><label>Vorname *</label><input type="text" id="f-first" placeholder="Max"></div>
         <div class="ff"><label>Nachname *</label><input type="text" id="f-last" placeholder="Mustermann"></div>
@@ -314,10 +299,10 @@
         <div class="ff"><label>E-Mail *</label><input type="email" id="f-email" placeholder="max@unternehmen.de"></div>
         <div class="ff"><label>Unternehmen</label><input type="text" id="f-company" placeholder="Mustermann GmbH"></div>
       </div>
-      <div class="form-err" id="form-err">Bitte fuellen Sie alle Pflichtfelder aus.</div>
+      <div class="form-err" id="form-err">Bitte füllen Sie alle Pflichtfelder aus.</div>
       <div class="consent-row">
         <input type="checkbox" id="f-consent">
-        <label for="f-consent">Ich bin einverstanden, dass Quanos Solutions mich zu passenden KI-Loesungen kontaktiert. Verarbeitung gemaess <a href="https://quanos.com/datenschutz" target="_blank">Datenschutzerklaerung</a>.</label>
+        <label for="f-consent">Ich bin einverstanden, dass Quanos Solutions mich zu passenden KI-Lösungen kontaktiert. Verarbeitung gemäß <a href="https://quanos.com/datenschutz" target="_blank">Datenschutzerklärung</a>.</label>
       </div>
       <button class="btn btn-primary" onclick="App.submitLead()">
         Detailreport freischalten
@@ -329,16 +314,11 @@
 
 <!-- == SCREEN: Full Results == -->
 <div id="s-full" class="screen">
-  <div class="header">
-    <div class="logo-mark"><svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-    <span class="logo-text">Quanos</span>
-    <span class="logo-badge">Ihr persoenlicher Report</span>
-  </div>
   <div class="card">
     <div id="result-greeting" style="font-family:var(--fh);font-size:22px;color:var(--navy);margin-bottom:8px;"></div>
     <p id="result-summary" style="color:var(--muted);font-size:15px;line-height:1.7;margin-bottom:28px;"></p>
 
-    <div class="section-title">Empfohlene Quanos KI-Loesungen</div>
+    <div class="section-title">Empfohlene Quanos KI-Lösungen</div>
     <div class="prod-grid" id="prod-grid"></div>
 
     <div class="section-title" style="margin-top:8px;">Ihr Reifegrad im Detail</div>
@@ -358,7 +338,7 @@
     </div>
 
     <div class="next-steps">
-      <h3>Ihre naechsten Schritte</h3>
+      <h3>Ihre nächsten Schritte</h3>
       <p>Unsere Experten zeigen Ihnen in einer kostenlosen Demo, wie Sie mit Quanos KI konkret Zeit und Kosten sparen abgestimmt auf Ihre Prozesse.</p>
       <div class="cta-row">
         <button class="btn btn-white" onclick="App.book()">Demo vereinbaren</button>
@@ -379,20 +359,20 @@
     <button class="modal-close" onclick="App.closeBook()">x</button>
     <div id="book-form">
       <h3>Demo-Termin vereinbaren</h3>
-      <p>Unsere Experten zeigen Ihnen live, wie die empfohlenen Quanos KI-Loesungen in Ihrer Umgebung funktionieren.</p>
+      <p>Unsere Experten zeigen Ihnen live, wie die empfohlenen Quanos KI-Lösungen in Ihrer Umgebung funktionieren.</p>
       <div class="form-row">
         <div class="ff"><label>Vorname *</label><input type="text" id="b-first" placeholder="Max"></div>
         <div class="ff"><label>Nachname *</label><input type="text" id="b-last" placeholder="Mustermann"></div>
       </div>
       <div class="ff" style="margin-bottom:12px;"><label>E-Mail *</label><input type="email" id="b-email" placeholder="max@unternehmen.de"></div>
       <div class="ff" style="margin-bottom:20px;"><label>Telefon (optional)</label><input type="tel" id="b-phone" placeholder="+49 (0) ..."></div>
-      <div class="form-err" id="book-err">Bitte fuellen Sie alle Pflichtfelder aus.</div>
+      <div class="form-err" id="book-err">Bitte füllen Sie alle Pflichtfelder aus.</div>
       <button class="btn btn-primary" style="width:100%;justify-content:center;" onclick="App.sendBook()">Anfrage absenden</button>
     </div>
     <div id="book-success" class="success" style="display:none;">
       <div class="success-icon">&#10003;</div>
       <h3 style="margin-bottom:8px;">Anfrage eingegangen!</h3>
-      <p style="color:var(--muted);margin-bottom:0;">Unser Team meldet sich innerhalb von 24 Stunden. Ihr AI-Readiness-Report wurde dabei automatisch uebermittelt.</p>
+      <p style="color:var(--muted);margin-bottom:0;">Unser Team meldet sich innerhalb von 24 Stunden. Ihr AI-Readiness-Report wurde dabei automatisch übermittelt.</p>
     </div>
   </div>
 </div>
@@ -406,7 +386,7 @@
 /* -- Questions -- */
 const QS = [
   { id:'q1',  path:'all', cat:'prozess', section:'Ihr Taetigkeitsbereich',
-    text:'In welchem Bereich sind Sie taetig?',
+    text:'In welchem Bereich sind Sie tätig?',
     hint:'Ihre Antwort passt die folgenden Fragen an Ihren Arbeitsbereich an.',
     multi:false,
     opts:[
@@ -424,7 +404,7 @@ const QS = [
     ]
   },
   { id:'q3d', path:'doc', cat:'prozess', section:'Ihre Ausgangssituation',
-    text:'Welches System nutzen Sie fuer die Technische Dokumentation?', hint:'', multi:false,
+    text:'Welches System nutzen Sie für die Technische Dokumentation?', hint:'', multi:false,
     opts:[
       {id:'word',  text:'Word / PDF (kein CMS)',              score:2,  tags:['no_cms']},
       {id:'st4',   text:'SCHEMA ST4',                        score:10, tags:['uses_st4']},
@@ -435,13 +415,13 @@ const QS = [
   { id:'q3s', path:'svc', cat:'prozess', section:'Ihre Ausgangssituation',
     text:'Wie stellen Sie Serviceinformationen bereit?', hint:'', multi:false,
     opts:[
-      {id:'print',    text:'Gedruckte Handbuecher / PDFs',                    score:2,  tags:['no_digital']},
+      {id:'print',    text:'Gedruckte Handbücher / PDFs',                    score:2,  tags:['no_digital']},
       {id:'static',   text:'Statisches Online-Portal',                       score:5,  tags:['static_portal']},
-      {id:'infotwin', text:'Quanos InfoTwin oder aehnliches System',          score:10, tags:['uses_infotwin']},
+      {id:'infotwin', text:'Quanos InfoTwin oder ähnliches System',          score:10, tags:['uses_infotwin']},
       {id:'none',     text:'Noch kein digitales System vorhanden',           score:0,  tags:['no_system']}
     ]
   },
-  { id:'q4d', path:'doc', cat:'prozess', section:'Prozesse & Aufwaende',
+  { id:'q4d', path:'doc', cat:'prozess', section:'Prozesse & Aufwände',
     text:'Wie viel Aufwand bedeutet die Metadatenvergabe pro Woche?', hint:'', multi:false,
     opts:[
       {id:'low',   text:'Kaum Aufwand (unter 1 Stunde)', score:8, tags:[]},
@@ -450,8 +430,8 @@ const QS = [
       {id:'vhigh', text:'Mehr als 10 Stunden',           score:0, tags:['metadata_effort']}
     ]
   },
-  { id:'q4s', path:'svc', cat:'prozess', section:'Prozesse & Aufwaende',
-    text:'Wie schnell finden Servicetechniker benoetigte Informationen?', hint:'', multi:false,
+  { id:'q4s', path:'svc', cat:'prozess', section:'Prozesse & Aufwände',
+    text:'Wie schnell finden Servicetechniker benötigte Informationen?', hint:'', multi:false,
     opts:[
       {id:'instant',text:'Sofort (unter 1 Minute)',  score:10, tags:[]},
       {id:'quick',  text:'1-5 Minuten',              score:7,  tags:[]},
@@ -459,27 +439,27 @@ const QS = [
       {id:'vslow',  text:'Mehr als 15 Minuten',      score:0,  tags:['slow_search']}
     ]
   },
-  { id:'q5d', path:'doc', cat:'prozess', section:'Prozesse & Aufwaende',
-    text:'Wie handhaben Sie Uebersetzungen Ihrer Dokumentation?', hint:'', multi:false,
+  { id:'q5d', path:'doc', cat:'prozess', section:'Prozesse & Aufwände',
+    text:'Wie handhaben Sie Übersetzungen Ihrer Dokumentation?', hint:'', multi:false,
     opts:[
-      {id:'none',   text:'Kein Uebersetzungsbedarf',                score:8, tags:[]},
-      {id:'manual', text:'Manuelle Uebersetzung intern',            score:2, tags:['translation']},
-      {id:'agency', text:'Externe Uebersetzungsagentur',            score:4, tags:['translation_cost']},
+      {id:'none',   text:'Kein Übersetzungsbedarf',                score:8, tags:[]},
+      {id:'manual', text:'Manuelle Übersetzung intern',            score:2, tags:['translation']},
+      {id:'agency', text:'Externe Übersetzungsagentur',            score:4, tags:['translation_cost']},
       {id:'semi',   text:'DeepL / Google Translate (manuell)',     score:4, tags:['translation_manual']}
     ]
   },
-  { id:'q5s', path:'svc', cat:'prozess', section:'Prozesse & Aufwaende',
+  { id:'q5s', path:'svc', cat:'prozess', section:'Prozesse & Aufwände',
     text:'Wie aktuell sind Ihre Serviceinformationen typischerweise?', hint:'', multi:false,
     opts:[
       {id:'current',text:'Immer aktuell gepflegt',                     score:10, tags:[]},
       {id:'mostly', text:'Meistens aktuell, gelegentlich veraltet',    score:6,  tags:[]},
       {id:'often',  text:'Oft veraltet',                               score:2,  tags:['outdated_info']},
-      {id:'unknown',text:'Kein vollstaendiger Ueberblick',             score:0,  tags:['no_overview']}
+      {id:'unknown',text:'Kein vollständiger Überblick',             score:0,  tags:['no_overview']}
     ]
   },
   { id:'q6d', path:'doc', cat:'prozess', section:'Standards & Compliance',
-    text:'Welche Standards muessen Sie erfuellen?',
-    hint:'Mehrfachauswahl moeglich', multi:true,
+    text:'Welche Standards müssen Sie erfüllen?',
+    hint:'Mehrfachauswahl möglich', multi:true,
     opts:[
       {id:'vdi',   text:'VDI 2770',                      score:3, tags:['vdi2770']},
       {id:'iirds', text:'iiRDS',                         score:3, tags:['iirds']},
@@ -511,26 +491,26 @@ const QS = [
       {id:'wait',     text:'Abwartend wir beobachten den Markt',  score:3,  tags:[]},
       {id:'interest', text:'Interessiert Budget noch unklar',      score:7,  tags:[]},
       {id:'roadmap',  text:'KI steht auf der Roadmap',             score:11, tags:[]},
-      {id:'active',   text:'Aktiv auf der Suche nach KI-Loesungen', score:15, tags:[]}
+      {id:'active',   text:'Aktiv auf der Suche nach KI-Lösungen', score:15, tags:[]}
     ]
   },
   { id:'q9', path:'all', cat:'strat', section:'Ziele & Strategie',
-    text:'Was sind Ihre wichtigsten Ziele fuer das naechste Jahr?',
-    hint:'Mehrfachauswahl moeglich', multi:true,
+    text:'Was sind Ihre wichtigsten Ziele für das nächste Jahr?',
+    hint:'Mehrfachauswahl möglich', multi:true,
     opts:[
       {id:'auto',   text:'Manuelle Prozesse automatisieren',        score:3, tags:['goal_auto']},
-      {id:'qual',   text:'Qualitaet der Dokumentation verbessern',  score:3, tags:['goal_qual']},
+      {id:'qual',   text:'Qualität der Dokumentation verbessern',  score:3, tags:['goal_qual']},
       {id:'cost',   text:'Kosten und Aufwand reduzieren',           score:3, tags:['goal_cost']},
       {id:'speed',  text:'Schneller auf den Markt kommen',          score:3, tags:['goal_speed']},
-      {id:'comply', text:'Normen und Standards erfuellen',          score:3, tags:['goal_comply']}
+      {id:'comply', text:'Normen und Standards erfüllen',          score:3, tags:['goal_comply']}
     ]
   },
   { id:'q10', path:'all', cat:'strat', section:'Ziele & Strategie',
-    text:'Wann planen Sie konkret den Einsatz von KI-Loesungen?', hint:'', multi:false,
+    text:'Wann planen Sie konkret den Einsatz von KI-Lösungen?', hint:'', multi:false,
     opts:[
       {id:'now',   text:'Sofort wir suchen aktiv',             score:6, tags:[]},
-      {id:'6mo',   text:'Innerhalb der naechsten 6 Monate',       score:5, tags:[]},
-      {id:'12mo',  text:'Innerhalb der naechsten 12 Monate',      score:3, tags:[]},
+      {id:'6mo',   text:'Innerhalb der nächsten 6 Monate',       score:5, tags:[]},
+      {id:'12mo',  text:'Innerhalb der nächsten 12 Monate',      score:3, tags:[]},
       {id:'later', text:'Noch kein konkreter Zeitplan',          score:1, tags:[]}
     ]
   }
@@ -539,23 +519,23 @@ const QS = [
 /* -- Products -- */
 const PRODS = {
   st4: {
-    name:'SCHEMA ST4', tag:'XML-CMS fuer Technische Dokumentation',
-    why:'Ein strukturiertes CMS ist die Basis fuer alle KI-Automatisierungen. SCHEMA ST4 bringt Ihre Dokumentation auf das naechste Level und ermoeglicht effiziente, modulare Inhalte.',
-    benefit:'Strukturierte Inhalte als Fundament fuer KI-Automatisierung'
+    name:'SCHEMA ST4', tag:'XML-CMS für Technische Dokumentation',
+    why:'Ein strukturiertes CMS ist die Basis für alle KI-Automatisierungen. SCHEMA ST4 bringt Ihre Dokumentation auf das nächste Level und ermöglicht effiziente, modulare Inhalte.',
+    benefit:'Strukturierte Inhalte als Fundament für KI-Automatisierung'
   },
   jetpack: {
-    name:'ST4 AI Jetpack', tag:'KI-Metadaten fuer SCHEMA ST4',
+    name:'ST4 AI Jetpack', tag:'KI-Metadaten für SCHEMA ST4',
     why:'Der ST4 AI Jetpack automatisiert die Metadatenvergabe in SCHEMA ST4 bis zu 80 % schneller als manuell. Die KI von plusmeta erkennt und vergibt passende Metadaten in Sekundenschnelle.',
     benefit:'Bis zu 80 % weniger Aufwand bei der Metadatenvergabe'
   },
   translator: {
-    name:'ST4 AI Translator', tag:'KI-Uebersetzung via DeepL',
-    why:'Automatisierte Voruebersetzung direkt im ST4-Workflow. Die DeepL-Integration uebersetzt Ihre Inhalte in Sekunden und reduziert Uebersetzungskosten erheblich.',
-    benefit:'Deutlich niedrigere Kosten und Zeit bei Uebersetzungen'
+    name:'ST4 AI Translator', tag:'KI-Übersetzung via DeepL',
+    why:'Automatisierte Vorübersetzung direkt im ST4-Workflow. Die DeepL-Integration uebersetzt Ihre Inhalte in Sekunden und reduziert Übersetzungskosten erheblich.',
+    benefit:'Deutlich niedrigere Kosten und Zeit bei Übersetzungen'
   },
   plusmeta: {
     name:'plusmeta Plattform', tag:'KI-Automatisierungsplattform',
-    why:'plusmeta automatisiert Metadatenvergabe und bereitet Dokumente fuer Standards wie VDI 2770 und iiRDS auf unabhaengig von Ihrem bestehenden System, als Plugin oder per API.',
+    why:'plusmeta automatisiert Metadatenvergabe und bereitet Dokumente für Standards wie VDI 2770 und iiRDS auf unabhängig von Ihrem bestehenden System, als Plugin oder per API.',
     benefit:'Standards-Compliance (VDI 2770 / iiRDS) automatisch'
   },
   infotwin: {
@@ -564,7 +544,7 @@ const PRODS = {
     benefit:'Serviceinformationen immer aktuell, digital und gezielt abrufbar'
   },
   assistant: {
-    name:'InfoTwin AI Assistant', tag:'KI-Chatbot fuer Service',
+    name:'InfoTwin AI Assistant', tag:'KI-Chatbot für Service',
     why:'Der InfoTwin AI Assistant beantwortet Fragen zu technischen Dokumenten per Chat direkt aus Ihren verifizierten InfoTwin-Daten. RAG-Technologie verhindert Halluzinationen.',
     benefit:'Sofortantworten auf alle Servicefragen per KI-Chat'
   }
@@ -573,9 +553,9 @@ const PRODS = {
 const PAIN_LABELS = {
   no_cms:           'Kein CMS fehlende Dokumentationsstruktur',
   metadata_effort:  'Hoher manueller Aufwand bei der Metadatenvergabe',
-  translation:      'Zeitaufwaendige manuelle Uebersetzungsprozesse',
-  translation_cost: 'Hohe Kosten durch externe Uebersetzungsagenturen',
-  translation_manual:'Keine automatisierte Uebersetzungsunterstuetzung',
+  translation:      'Zeitaufwändige manuelle Übersetzungsprozesse',
+  translation_cost: 'Hohe Kosten durch externe Übersetzungsagenturen',
+  translation_manual:'Keine automatisierte Übersetzungsunterstützung',
   vdi2770:          'VDI 2770-Compliance noch nicht umgesetzt',
   iirds:            'iiRDS-Standard noch nicht implementiert',
   iec:              'IEC 61406 / QR-Code-Standard ausstehend',
@@ -583,10 +563,10 @@ const PAIN_LABELS = {
   static_portal:    'Statisches Portal ohne intelligente Filterung',
   slow_search:      'Servicetechniker finden Informationen zu langsam',
   outdated_info:    'Serviceinformationen oft nicht aktuell',
-  no_overview:      'Kein Ueberblick ueber Aktualitaet der Inhalte',
+  no_overview:      'Kein Überblick über Aktualität der Inhalte',
   no_system:        'Kein digitales Servicesystem vorhanden',
-  variants:         'Verwaltung vieler Produktvarianten ist aufwaendig',
-  many_variants:    'Sehr hohe Komplexitaet durch viele Produktvarianten'
+  variants:         'Verwaltung vieler Produktvarianten ist aufwändig',
+  many_variants:    'Sehr hohe Komplexität durch viele Produktvarianten'
 };
 
 /* ==============================
@@ -782,10 +762,10 @@ const App = (() => {
     let level, desc, pc;
     if (score <= 35) {
       level='KI-Einsteiger'; pc='pill-ein';
-      desc='Sie stehen am Anfang Ihrer KI-Reise. Es gibt klare Quick-Wins, die Sie sofort umsetzen koennen.';
+      desc='Sie stehen am Anfang Ihrer KI-Reise. Es gibt klare Quick-Wins, die Sie sofort umsetzen können.';
     } else if (score <= 65) {
       level='KI-Aufholer'; pc='pill-auf';
-      desc='Ihre Basis ist solide. Mit gezielten KI-Loesungen erzielen Sie jetzt deutliche Effizienzgewinne.';
+      desc='Ihre Basis ist solide. Mit gezielten KI-Lösungen erzielen Sie jetzt deutliche Effizienzgewinne.';
     } else {
       level='KI-Vorreiter'; pc='pill-vor';
       desc='Sie sind gut aufgestellt. Jetzt geht es darum, KI tief in Ihre Prozesse zu integrieren.';
@@ -834,8 +814,8 @@ const App = (() => {
 
     if (!ok || !consent) {
       errEl.textContent = !consent && ok
-        ? 'Bitte stimmen Sie der Datenschutzerklaerung zu.'
-        : 'Bitte fuellen Sie alle Pflichtfelder aus.';
+        ? 'Bitte stimmen Sie der Datenschutzerklärung zu.'
+        : 'Bitte füllen Sie alle Pflichtfelder aus.';
       errEl.style.display = 'block';
       return;
     }
@@ -860,7 +840,7 @@ const App = (() => {
         legalConsentOptions: {
           consent: {
             consentToProcess: true,
-            text: 'Ich stimme der Verarbeitung meiner Daten gemaess der Datenschutzerklaerung zu.'
+            text: 'Ich stimme der Verarbeitung meiner Daten gemäß der Datenschutzerklärung zu.'
           }
         }
       })
@@ -875,11 +855,11 @@ const App = (() => {
     const l = S.lead;
 
     document.getElementById('result-greeting').textContent =
-      (l.first ? l.first + ', Ihr' : 'Ihr') + ' persoenlicher AI-Readiness-Report';
+      (l.first ? l.first + ', Ihr' : 'Ihr') + ' persönlicher AI-Readiness-Report';
 
     const sumTexts = [
       'Mit ' + r.total + ' von 100 Punkten stehen Sie am Beginn Ihrer KI-Transformation. Unsere Empfehlungen helfen Ihnen, schnell messbare Ergebnisse zu erzielen.',
-      'Mit ' + r.total + ' von 100 Punkten haben Sie eine solide Basis. Gezielte KI-Loesungen bringen Sie jetzt deutlich voran.',
+      'Mit ' + r.total + ' von 100 Punkten haben Sie eine solide Basis. Gezielte KI-Lösungen bringen Sie jetzt deutlich voran.',
       'Mit ' + r.total + ' von 100 Punkten sind Sie KI-Vorreiter. Nutzen Sie jetzt das volle Potenzial der Quanos KI-Plattform.'
     ];
     document.getElementById('result-summary').textContent =
@@ -898,7 +878,7 @@ const App = (() => {
         '</div>';
     });
     if (!r.recs.length) {
-      grid.innerHTML = '<p style="color:var(--muted);font-size:14px;">Wir empfehlen ein individuelles Beratungsgespraech mit unseren Experten.</p>';
+      grid.innerHTML = '<p style="color:var(--muted);font-size:14px;">Wir empfehlen ein individuelles Beratungsgespräch mit unseren Experten.</p>';
     }
 
     const bmap = { prozess:'p', ki:'k', strat:'s' };
@@ -947,7 +927,7 @@ const App = (() => {
 
     const recHtml = r.recs.map(function(id) {
       const p = PRODS[id];
-      return p ? '<div style="background:#eef2f7;border-radius:8px;padding:16px;margin-bottom:12px;border-left:4px solid #0070d4;">' +
+      return p ? '<div style="background:#f3f5f8;border-radius:8px;padding:16px;margin-bottom:12px;border-left:4px solid #0070d4;">' +
         '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#5a6880;margin-bottom:3px;">' + p.tag + '</div>' +
         '<div style="font-size:16px;font-weight:700;color:#04254a;margin-bottom:5px;">' + p.name + '</div>' +
         '<div style="font-size:13px;color:#1a2940;line-height:1.5;">' + p.why + '</div>' +
@@ -961,7 +941,7 @@ const App = (() => {
     const target = document.getElementById('pdf-target');
     target.innerHTML =
       '<div style="font-family:sans-serif;color:#1a2940;padding:40px;max-width:700px;">' +
-        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #eef2f7;">' +
+        '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:28px;padding-bottom:18px;border-bottom:2px solid #f3f5f8;">' +
           '<div>' +
             '<div style="font-size:22px;font-weight:700;color:#04254a;margin-bottom:3px;">Quanos AI Readiness Report</div>' +
             '<div style="font-size:13px;color:#5a6880;">' + l.first + ' ' + l.last + (l.company?' - '+l.company:'') + ' - ' + new Date().toLocaleDateString('de-DE') + '</div>' +
@@ -976,10 +956,10 @@ const App = (() => {
           '<div style="font-size:22px;font-weight:700;margin-bottom:6px;">' + maturity + '</div>' +
           '<div style="font-size:13px;opacity:.88;">Prozessreife: ' + r.bd.prozess.score + '/' + r.bd.prozess.max + ' Pkt. | KI-Bereitschaft: ' + r.bd.ki.score + '/' + r.bd.ki.max + ' Pkt. | Strategie: ' + r.bd.strat.score + '/' + r.bd.strat.max + ' Pkt.</div>' +
         '</div>' +
-        '<div style="font-size:17px;font-weight:700;color:#04254a;margin-bottom:12px;border-bottom:2px solid #eef2f7;padding-bottom:8px;">Ihre Produktempfehlungen</div>' +
+        '<div style="font-size:17px;font-weight:700;color:#04254a;margin-bottom:12px;border-bottom:2px solid #f3f5f8;padding-bottom:8px;">Ihre Produktempfehlungen</div>' +
         recHtml +
-        (painHtml ? '<div style="font-size:17px;font-weight:700;color:#04254a;margin:20px 0 10px;border-bottom:2px solid #eef2f7;padding-bottom:8px;">Identifizierte Handlungsfelder</div><ul style="padding-left:20px;line-height:1.8;">' + painHtml + '</ul>' : '') +
-        '<div style="margin-top:32px;padding-top:16px;border-top:1px solid #eef2f7;text-align:center;color:#5a6880;font-size:11px;">' +
+        (painHtml ? '<div style="font-size:17px;font-weight:700;color:#04254a;margin:20px 0 10px;border-bottom:2px solid #f3f5f8;padding-bottom:8px;">Identifizierte Handlungsfelder</div><ul style="padding-left:20px;line-height:1.8;">' + painHtml + '</ul>' : '') +
+        '<div style="margin-top:32px;padding-top:16px;border-top:1px solid #f3f5f8;text-align:center;color:#5a6880;font-size:11px;">' +
           'Quanos Solutions GmbH - quanos.com - Dieser Report wurde automatisch generiert.' +
         '</div>' +
       '</div>';
